@@ -22,17 +22,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build -- --base-href "/${{ github.event.repository.name }}/"
+      - name: Build in Docker
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/app" \
+            -w /app \
+            node:24-bullseye \
+            bash -lc 'npm ci && npm run build -- --base-href "/${{ github.event.repository.name }}/"'
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
